@@ -1,0 +1,15 @@
+[project]
+name = "code-review-env"
+version = "0.1.0"
+description = "AI Code Review Environment with reward-based evaluation"
+authors = [
+    {name = "Ishan Meduri"}
+]
+dependencies = [
+    "fastapi",
+    "uvicorn",
+    "python-multipart"
+]
+
+[tool.openenv]
+entrypoint = "env.py"
