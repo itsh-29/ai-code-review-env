@@ -1,0 +1,12 @@
+name: code-review-env
+entrypoint: env.py
+
+observation_space:
+  code: string
+  difficulty: string
+
+action_space:
+  label: string
+  explanation: string
+
+reward_range: [0.0, 1.0]
