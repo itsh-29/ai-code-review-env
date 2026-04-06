@@ -8,8 +8,12 @@ authors = [
 dependencies = [
     "fastapi",
     "uvicorn",
-    "python-multipart"
+    "python-multipart",
+    "openenv-core>=0.2.0"
 ]
+
+[project.scripts]
+server = "server.app:app"
 
 [tool.openenv]
 entrypoint = "env.py"
