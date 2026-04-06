@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . .
 
 # Install required dependencies
-RUN pip install --no-cache-dir fastapi uvicorn
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose port (HuggingFace uses 7860)
 EXPOSE 7860
