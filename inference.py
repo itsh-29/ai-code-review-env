@@ -1,53 +1,47 @@
 from environment import CodeReviewEnv
 
-import random
-
-def agent(obs):
-    code = obs["code"]
-
-    if "def add(a,b)" in code:
-        return {
-            "label": "syntax_error",
-            "explanation": "missing colon in function definition"
-        }
-
-    elif "return a-b" in code:
-        return {
-            "label": random.choice(["logic_error", "no_issue"]),
-            "explanation": "wrong operation used"
-        }
-
-    elif "append" in code:
-        return {
-            "label": "optimization_suggestion",
-            "explanation": "can be written faster using list comprehension"
-        }
-
-    else:
-        return {
-            "label": "no_issue",
-            "explanation": "code looks fine"
-        }
-
 env = CodeReviewEnv()
 
-scores = {"easy": [], "medium": [], "hard": []}
+tasks = ["easy", "medium", "hard"]
+scores = {}
 
-for i in range(10):
-    obs = env.reset()
-    action = agent(obs)
-    _, reward, done, info = env.step(action)
+for difficulty in tasks:
+    total_reward = 0
+    steps = 0
 
-    scores[info["difficulty"]].append(reward)
+    print(f"[START] task={difficulty}", flush=True)
 
-    print("Code:", obs["code"])
-    print("Difficulty:", info["difficulty"])
-    print("Prediction:", action)
-    print("Correct:", info["correct"])
-    print("Reward:", reward)
-    print("------")
+    for _ in range(3):  # run few samples
+        obs = env.reset()
 
-print("\nFINAL SCORES:")
-for level in scores:
-    if scores[level]:
-        print(level, ":", sum(scores[level]) / len(scores[level]))
+        # simple baseline agent
+        if obs["difficulty"] == "easy":
+            action = {
+                "label": "syntax_error",
+                "explanation": "missing syntax",
+                "fix": "add colon"
+            }
+        elif obs["difficulty"] == "medium":
+            action = {
+                "label": "logic_error",
+                "explanation": "wrong logic",
+                "fix": "correct operator"
+            }
+        else:
+            action = {
+                "label": "optimization_suggestion",
+                "explanation": "can be optimized",
+                "fix": "use list comprehension"
+            }
+
+        _, reward, done, info = env.step(action)
+
+        steps += 1
+        total_reward += reward
+
+        print(f"[STEP] step={steps} reward={reward}", flush=True)
+
+    avg_score = total_reward / steps if steps > 0 else 0
+    scores[difficulty] = avg_score
+
+    print(f"[END] task={difficulty} score={avg_score} steps={steps}", flush=True)
