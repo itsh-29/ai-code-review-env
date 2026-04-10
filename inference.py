@@ -16,13 +16,17 @@ client = OpenAI(
 
 # ✅ Minimal LLM call (REQUIRED for validation)
 def call_llm(prompt):
-    response = client.chat.completions.create(
-        model=MODEL_NAME,
-        messages=[{"role": "user", "content": prompt}],
-        max_tokens=10
-    )
-    return response.choices[0].message.content
+    try:
+        response = client.chat.completions.create(
+            model=os.environ["MODEL_NAME"],
+            messages=[{"role": "user", "content": prompt}],
+            max_tokens=10
+        )
+        return response.choices[0].message.content
 
+    except Exception as e:
+        print(f"[LLM ERROR] {str(e)}", flush=True)
+        return "fallback"
 
 env = CodeReviewEnv()
 
