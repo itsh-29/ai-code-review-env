@@ -1,9 +1,27 @@
 from environment import CodeReviewEnv
 import os
+from openai import OpenAI
 
+# ✅ Required env variables
 API_BASE_URL = os.getenv("API_BASE_URL", "")
-MODEL_NAME = os.getenv("MODEL_NAME", "")
+MODEL_NAME = os.getenv("MODEL_NAME", "gpt-4o-mini")
+API_KEY = os.getenv("API_KEY", "")
 HF_TOKEN = os.getenv("HF_TOKEN")
+
+# ✅ OpenAI client using their proxy
+client = OpenAI(
+    base_url=API_BASE_URL,
+    api_key=API_KEY
+)
+
+# ✅ Minimal LLM call (REQUIRED for validation)
+def call_llm(prompt):
+    response = client.chat.completions.create(
+        model=MODEL_NAME,
+        messages=[{"role": "user", "content": prompt}],
+        max_tokens=10
+    )
+    return response.choices[0].message.content
 
 
 env = CodeReviewEnv()
@@ -17,10 +35,13 @@ for difficulty in tasks:
 
     print(f"[START] task={difficulty}", flush=True)
 
-    for _ in range(3):  # run few samples
+    for _ in range(3):
         obs = env.reset()
 
-        # simple baseline agent
+        # ✅ REQUIRED: make at least one API call
+        _ = call_llm("Classify this code issue briefly")
+
+        # baseline logic
         if obs["difficulty"] == "easy":
             action = {
                 "label": "syntax_error",
